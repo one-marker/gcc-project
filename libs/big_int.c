@@ -9,7 +9,7 @@ void dadd(unsigned char *dbytes, int *psize, unsigned char summand);
 
 void mem_error()
 {
-	printf("������������ ������. ������ ��������� ����������\n");
+	printf("Недостаточно памяти. Работа программы прекращена\n");
 	exit(1);
 }
 
