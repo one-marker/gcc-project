@@ -2,14 +2,14 @@
 #include <locale.h>
 #include <stdlib.h>
  
-void print(int number1, int number2, int gcd);
+void print(int gcd,int number1, int number2);
 int isValidate(int number1, int number2);	
 int euclid(int number1, int number2);			//алгоритм Евклдиа
 	
 
 
 
-void print(int number1, int number2, int gcd) {
+void print(int gcd,int number1, int number2) {
 	printf("Numbers: %d and %d\n", number1, number2);
 	printf("The result of the Euclidean algorithm: \t");
 	printf("NOD = %d\n", gcd);
@@ -17,7 +17,7 @@ void print(int number1, int number2, int gcd) {
 
 int isValidate(int number1, int number2) {
 
-   if ((number1 == 0) && (number2 == 0)) {
+   if ((number1 == 0) || (number2 == 0)) {
 		printf("The result is undefined!");
 		return(0);
 	}
@@ -28,15 +28,6 @@ int isValidate(int number1, int number2) {
 	if ((number1 == 1) || (number2 == 1)) {
 		printf("NOD = 1\n");
 		return(0);
-	}
-    
-    if ((number1 == 0) || (number2 == 0)) {
-		if (number1 == 0) {
-			printf("NOD = %d\n", number2);
-		} else if (number2 == 0) {
-			printf("NOD = %d\n", number1);
-		}
-		return(0); 
 	}
 	return(1);
 }
@@ -79,7 +70,7 @@ int euclid(int number1, int number2) {
 
 int main() {
 	
-	//Использовать только целые числа и нуль!
+	//используем int
 
 	int number1 = 24;
 	int number2 = 6;

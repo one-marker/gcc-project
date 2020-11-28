@@ -25,7 +25,7 @@ int isValidate(big_int *number1, big_int *number2) {
 		printf("NOD = %s\n", dprint(number1));
 		return(0);
 	}
-	if ((!compare(number1, dcreate("1"))) || (!compare(number1, dcreate("1")))) {
+	if ((!compare(number1, dcreate("1"))) || (!compare(number2, dcreate("1")))) {
 		printf("NOD = 1\n");
 		return(0);
 	}
