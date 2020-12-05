@@ -19,7 +19,7 @@ if "%choice%"=="2" (
     compiled_program.exe 
 )
 if "%choice%"=="3" (
-    extended_euclid.exe 
+    start_extended_euclid.bat
 )
 
 Echo.
