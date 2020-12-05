@@ -54,3 +54,4 @@ dkms.conf
 # tmp
 .vscode
 .dist
+.md

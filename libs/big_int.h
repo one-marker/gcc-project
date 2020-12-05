@@ -9,6 +9,10 @@ typedef struct
 {
 	unsigned char *bytes;
 	int size;
+	unsigned char sign_byte;
+	//0 - полложительное число
+	//1 - отрицательное число
+
 } big_int;
 
 big_int *from_byte(unsigned char byte);
@@ -20,16 +24,21 @@ unsigned int count_bits(const big_int *bi);
 big_int *two_pow(unsigned int power);
 big_int *deduct(big_int *bi1, const big_int *bi2);
 big_int *difference(const big_int *bi1, const big_int *bi2);
+big_int *difference2(const big_int *bi1, const big_int *bi2);
 big_int *multiply(big_int *bi1, const big_int *bi2);
 big_int *product(const big_int *bi1, const big_int *bi2);
 big_int *add(big_int *bi1, const big_int *bi2);
+big_int *abs_bi(const big_int *bi1);
+big_int *inv_bi(const big_int *bi1);
 void hout(const big_int *bi);
 void dout(const big_int *bi);
 big_int *create(const void *bytes, int size);
 big_int *hcreate(const char *string);
 big_int *dcreate(const char *string);
+big_int *dcreate2(unsigned char sign_byte, const char *string);
 char *hprint(const big_int *bi);
 char *dprint(const big_int *bi);
 big_int *sum(const big_int *bi1, const big_int *bi2);
+//big_int *sum2(const big_int *bi1, const big_int *bi2);
 int compare(const big_int *bi1, const big_int *bi2);
 void delete(big_int *bi);

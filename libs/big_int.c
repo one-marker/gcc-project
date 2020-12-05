@@ -24,18 +24,18 @@ unsigned int count_bits(const big_int *bi)
 }
 
 big_int *simple_division2pow(const big_int *bi, unsigned int power, unsigned int count)
-{   
+{
     int size = bi->size;
     unsigned char *bytes = bi->bytes;
     if (!power)
-        return create(bytes, size);        
+        return create(bytes, size);
     if (power >= count)
         return from_byte(0);
     int rem = power % 8;
     if (!rem)
     {
         int rem_size = power / 8;
-        return create(bytes + rem_size, size - rem_size);        
+        return create(bytes + rem_size, size - rem_size);
     }
     int rem_size = power / 8 + 1, add = 8 - rem;
     unsigned int quot_count = count - power;
@@ -45,7 +45,7 @@ big_int *simple_division2pow(const big_int *bi, unsigned int power, unsigned int
     unsigned char *quot_bytes;
     if (!(quot_bytes = malloc(quot_size)))
         mem_error();
-    int delta = rem_size - 1; 
+    int delta = rem_size - 1;
     for (int i = 0; i < quot_size; i++)
     {
         quot_bytes[i] = bytes[delta + i] >> rem;
@@ -62,13 +62,21 @@ big_int *simple_division2pow(const big_int *bi, unsigned int power, unsigned int
 
 big_int *divide(big_int *bi1, const big_int *bi2, big_int **remainder)
 {
+	// unsigned char s_byte;
+	// if (bi1->sign_byte != bi2->sign_byte)
+	// 	s_byte = '1';
+	// else
+	// 	s_byte = '0';
+
     big_int *p = division(bi1, bi2, remainder);
     if (!p)
         return 0;
     free(bi1->bytes);
     bi1->bytes = p->bytes;
     bi1->size = p->size;
+	//bi1->sign_byte = s_byte;
     free(p);
+
     return bi1;
 }
 
@@ -78,7 +86,7 @@ big_int *division(const big_int *bi1, const big_int *bi2, big_int **remainder)
     int size1 = bi1->size, size2 = bi2->size;
     if (bytes2[size2 - 1] == 0)
         return 0;
-    unsigned int count2 = count_bits(bi2); 
+    unsigned int count2 = count_bits(bi2);
     int r = count2 % 8 - 1;
     if (r < 0)
         r = 7;
@@ -92,10 +100,10 @@ big_int *division(const big_int *bi1, const big_int *bi2, big_int **remainder)
                 break;
             }
         if (zero)
-            return division2pow(bi1, count2 - 1, remainder);         
+            return division2pow(bi1, count2 - 1, remainder);
     }
     big_int *rem = create(bytes1, size1);
-    big_int *quot = from_byte(0);   
+    big_int *quot = from_byte(0);
     unsigned int count1 = count_bits(bi1);
     while (count1 > count2)
     {
@@ -129,14 +137,14 @@ big_int *divide2pow(big_int *bi, unsigned int power, big_int **remainder)
 }
 
 big_int *division2pow(const big_int *bi, unsigned int power, big_int **remainder)
-{   
+{
     int size = bi->size;
     unsigned char *bytes = bi->bytes;
     if (!power)
     {
         if (remainder)
             *remainder = from_byte(0);
-        return create(bytes, size);        
+        return create(bytes, size);
     }
     unsigned int count = count_bits(bi);
     if (power >= count)
@@ -151,7 +159,7 @@ big_int *division2pow(const big_int *bi, unsigned int power, big_int **remainder
         int rem_size = power / 8;
         if (remainder)
             *remainder = create(bytes, rem_size);
-        return create(bytes + rem_size, size - rem_size);        
+        return create(bytes + rem_size, size - rem_size);
     }
     int rem_size = power / 8 + 1, add = 8 - rem;
     if (remainder)
@@ -168,7 +176,7 @@ big_int *division2pow(const big_int *bi, unsigned int power, big_int **remainder
             free(rem_bytes);
         }
         else
-        {          
+        {
             if (!(*remainder = malloc(sizeof(big_int))))
                 mem_error();
             (*remainder)->bytes = rem_bytes;
@@ -182,7 +190,7 @@ big_int *division2pow(const big_int *bi, unsigned int power, big_int **remainder
     unsigned char *quot_bytes;
     if (!(quot_bytes = malloc(quot_size)))
         mem_error();
-    int delta = rem_size - 1; 
+    int delta = rem_size - 1;
     for (int i = 0; i < quot_size; i++)
     {
         quot_bytes[i] = bytes[delta + i] >> rem;
@@ -215,7 +223,7 @@ big_int *two_pow(unsigned int power)
         mem_error();
     bi->bytes = bytes;
     bi->size = size;
-    return bi;     
+    return bi;
 }
 
 big_int *deduct(big_int *bi1, const big_int *bi2)
@@ -248,7 +256,7 @@ big_int *difference(const big_int *bi1, const big_int *bi2)
 			buf = -1;
 		}
 		else
-		{			
+		{
 			*(bytes + i) = buf;
 			buf = 0;
 		}
@@ -262,7 +270,7 @@ big_int *difference(const big_int *bi1, const big_int *bi2)
 			buf = -1;
 		}
 		else
-		{			
+		{
 			*(bytes + i) = buf;
 			buf = 0;
 		}
@@ -287,6 +295,49 @@ big_int *difference(const big_int *bi1, const big_int *bi2)
 	return result;
 }
 
+big_int *difference2(const big_int *bi1, const big_int *bi2)
+{
+  big_int *bi;
+
+  //если оба числа положительные
+  if ((bi1->sign_byte == '0') && (bi2->sign_byte == '0')) {
+    if (compare(bi1, bi2) >= 0) {
+      bi = difference(bi1, bi2);
+      bi->sign_byte = '0';
+    } else {
+      bi = difference(bi2, bi1);
+      bi->sign_byte = '1';
+    }
+	return bi;
+  }
+  //если оба числа отрицательные
+  if ((bi1->sign_byte == '1') && (bi2->sign_byte == '1')) {
+    if (compare(bi1, bi2) > 0) {
+      bi = difference(bi1, bi2);
+      bi->sign_byte = '1';
+    } else {
+      bi = difference(bi2, bi1);
+      bi->sign_byte = '0';
+    }
+	return bi;
+  }
+  //-+
+  if ((bi1->sign_byte == '1') && (bi2->sign_byte == '0')) {
+    bi = sum(bi1, bi2);
+    bi->sign_byte = '1';
+	return bi;
+  }
+  //+-
+  if ((bi1->sign_byte == '0') && (bi2->sign_byte == '1')) {
+    bi = sum(bi1, bi2);
+    bi->sign_byte = '0';
+	return bi;
+  }
+
+
+}
+
+
 big_int *multiply(big_int *bi1, const big_int *bi2)
 {
 	big_int *p = product(bi1, bi2);
@@ -303,13 +354,13 @@ big_int *product(const big_int *bi1, const big_int *bi2)
 	unsigned char *bytes1 = bi1->bytes, *bytes2 = bi2->bytes, *bytes;
 	big_int *temp, *result;
 	if (!(result = malloc(sizeof(big_int))))
-		mem_error();	
+		mem_error();
 	if (size1 == 1 && *bytes1 == 0 || size2 == 1 && *bytes2 == 0)
 	{
 		if (!(result->bytes = malloc(1)))
-			mem_error();	
+			mem_error();
 		*result->bytes = 0;
-		result->size = 1;	
+		result->size = 1;
 		return result;
 	}
 	if (!(temp = malloc(sizeof(big_int))))
@@ -346,9 +397,21 @@ big_int *product(const big_int *bi1, const big_int *bi2)
 		result->bytes = newbytes;
 		free(bytes);
 	}
+
 	return result;
 }
 
+big_int *product2(const big_int *bi1, const big_int *bi2) {
+    big_int *result = product(bi1, bi2);
+
+    if (bi1->sign_byte != bi2->sign_byte)
+		result->sign_byte = '1';
+	else
+		result->sign_byte = '0';
+
+    return result;
+
+}
 void add4mul(big_int *bi1, const big_int *bi2)
 {
 	unsigned char *bytes1 = bi1->bytes, *bytes2 = bi2->bytes;
@@ -387,7 +450,11 @@ big_int *add(big_int *bi1, const big_int *bi2)
 void dout(const big_int *bi)
 {
 	char *str = dprint(bi);
-	printf("%s", str);
+	if (bi->sign_byte == '1')
+		printf("-%s", str);
+	else
+		printf("%s", str);
+
 	free(str);
 }
 
@@ -445,7 +512,7 @@ big_int *hcreate(const char *string)
 	if (!(bytes = malloc(size)))
 		mem_error();
 	int count = size - 1;
-	int buf;	
+	int buf;
 	if (odd)
 	{
 		if (!isxdigit(*string))
@@ -467,12 +534,12 @@ big_int *hcreate(const char *string)
 		}
 		sscanf(string, "%2x", &buf);
 		*(bytes + count) = buf;
-		if (count)	
+		if (count)
 		{
 			string++;
 			string++;
 		}
-	}	
+	}
 	big_int *bi;
 	if (!(bi = malloc(sizeof(big_int))))
 		mem_error();
@@ -489,7 +556,7 @@ void badd(unsigned char *bytes, int *psize, unsigned char summand)
 		if (!buf)
 			return;
 		*(bytes + i) = buf += *(bytes + i);
-		buf >>= 8; 
+		buf >>= 8;
 	}
 	if (buf)
 	{
@@ -504,7 +571,7 @@ void bmul(unsigned char *bytes, int *psize, unsigned char factor)
 	for (int i = 0; i < *psize; i++)
 	{
 		*(bytes + i) = buf += *(bytes + i) * factor;
-		buf >>= 8; 
+		buf >>= 8;
 	}
 	if (buf)
 	{
@@ -515,6 +582,9 @@ void bmul(unsigned char *bytes, int *psize, unsigned char factor)
 
 big_int *dcreate(const char *string)
 {
+
+
+
 	if (!string)
 		return 0;
 	int len = strlen(string);
@@ -524,7 +594,7 @@ big_int *dcreate(const char *string)
 		return 0;
 	char odd = len % 2;
 	int size = len * LOG_256_10 + 1;
-	int buf;	
+	int buf;
 	if (odd)
 	{
 		if (!isdigit(*string))
@@ -557,17 +627,78 @@ big_int *dcreate(const char *string)
         if (buf)
         	badd(bytes, &size, buf);
 		string++;
-        string++;     
+        string++;
 	}
 	if (!(bytes = realloc(bytes, size)))
 		mem_error();
 	big_int *bi;
+
 	if (!(bi = malloc(sizeof(big_int))))
 		mem_error();
 	bi->bytes = bytes;
 	bi->size = size;
+	bi->sign_byte = '0';
 	return bi;
 }
+
+big_int *dcreate2(unsigned char sign_byte, const char *string)
+{
+	if (!string)
+		return 0;
+	int len = strlen(string);
+	if (!len)
+		return 0;
+	if (*string == '0' && len != 1)
+		return 0;
+	char odd = len % 2;
+	int size = len * LOG_256_10 + 1;
+	int buf;
+	if (odd)
+	{
+		if (!isdigit(*string))
+			return 0;
+		sscanf(string, "%1d", &buf);
+		string++;
+	}
+	else
+	{
+		if (!isdigit(*string) || !isdigit(*(string + 1)))
+			return 0;
+		sscanf(string, "%2d", &buf);
+		string++;
+		string++;
+	}
+	unsigned char *bytes;
+	if (!(bytes = malloc(size)))
+		mem_error();
+	*bytes = buf;
+	size = 1;
+	while (*string)
+	{
+		if (!isxdigit(*string) || !isxdigit(*(string + 1)))
+		{
+			free(bytes);
+			return 0;
+		}
+		sscanf(string, "%2d", &buf);
+		bmul(bytes, &size, 100);
+        if (buf)
+        	badd(bytes, &size, buf);
+		string++;
+        string++;
+	}
+	if (!(bytes = realloc(bytes, size)))
+		mem_error();
+	big_int *bi;
+
+	if (!(bi = malloc(sizeof(big_int))))
+		mem_error();
+	bi->bytes = bytes;
+	bi->size = size;
+	bi->sign_byte = sign_byte;
+	return bi;
+}
+
 
 char *hprint(const big_int *bi)
 {
@@ -627,7 +758,7 @@ void dadd(unsigned char *dbytes, int *psize, unsigned char summand)
 		if (!buf)
 			return;
 		*(dbytes + i) = (buf += *(dbytes + i)) % 100;
-		buf /= 100; 
+		buf /= 100;
 	}
 	if (buf)
 	{
@@ -651,7 +782,7 @@ char *dprint(const big_int *bi)
 	if (buf)
 		dadd(dbytes, &size, buf);
 	while (count--)
-	{  
+	{
 		dmul(dbytes, &size);
 		buf = *(bytes + count);
         if (buf)
@@ -683,7 +814,7 @@ char *dprint(const big_int *bi)
 		str++;
 		str++;
 	}
-	*str = '\0';	
+	*str = '\0';
 	free(dbytes);
 	return string;
 }
@@ -735,6 +866,7 @@ big_int *sum(const big_int *bi1, const big_int *bi2)
 	return bi;
 }
 
+
 int compare(const big_int *bi1, const big_int *bi2)
 {
 	if (bi1 == bi2)
@@ -753,4 +885,19 @@ void delete(big_int *bi)
 {
 	free(bi->bytes);
 	free(bi);
+}
+
+big_int *abs_bi(const big_int *bi1) {
+	big_int *bi = bi1;
+	bi->sign_byte = '0';
+	return bi;
+}
+
+big_int *inv_bi(const big_int *bi1) {
+	big_int *bi = bi1;
+	if (bi->sign_byte == '1')
+		bi->sign_byte = '0';
+	else
+		bi->sign_byte = '1';
+	return bi;
 }
