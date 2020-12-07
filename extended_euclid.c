@@ -29,6 +29,10 @@ int main(void) {
       break;
   }
 
+  if (x0->sign_byte == '1')
+    x0 = difference2(x0, inv_bi(m));
+  
+
   printf("Answer: ");
   dout(x0);
 
